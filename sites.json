@@ -1,0 +1,4 @@
+{
+  "localhost:8080": { "directory":  "sites/test-one/public" },
+  "default": { "directory":         "sites/test-two" }
+}
