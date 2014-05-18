@@ -53,15 +53,19 @@ function site404(details){
   }
 }
 
+function about(request){
+  client_ip = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
+  return request.headers.host+" "+request.method+" "+request.url+" "+client_ip+" "+request.headers["user-agent"];
+}
+
 function handleRequest(request, response) {
   request.addListener("end", function () {
+
     site = sites[request.headers.host] || sites["default"];
     if(site){
-      logger.info(request.headers.host+" "+request.connection.remoteAddress+" "+request.method+" "+request.url);
-
       site.server.serve(request, response, function(err, result) {
         if(err) {
-          logger.error(request.headers.host+" "+request.connection.remoteAddress+" "+request.method+" "+request.url+" "+err.status+" "+err.message);
+           logger.error(about(request)+" "+err.status);
           if(err.status == 404){
             site.server.serveFile(site.notFoundPage, 404, {}, request, response);
           }
@@ -70,6 +74,8 @@ function handleRequest(request, response) {
             response.writeHead(err.status, err.headers);
             response.end();
           }
+        }else{
+          logger.info(about(request)+" 200");
         }
       })
     }
